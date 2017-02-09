@@ -1,0 +1,12 @@
+<launch>
+  <!-- The Cozmo driver has the following parts:
+The hardware interface,
+A localizer node,
+The higher-level controller.
+  -->
+  <group ns="cozmo_driver">
+    <node pkg="cozmo_driver" type="cozmo_hardware_interface.py" name="cozmo_hardware_interface" />
+    <node pkg="cozmo_driver" type="cozmo_high_level_controller.py" name="cozmo_high_level_controller" />
+    <node pkg="cozmo_driver" type="cozmo_localizer.py" name="cozmo_localizer" />
+  </group>
+</launch>
