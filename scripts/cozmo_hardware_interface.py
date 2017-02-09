@@ -44,7 +44,6 @@ class CozmoRos(object):
 		self._battery_pub = rospy.Publisher('battery', BatteryState,
 											queue_size=100)
 		self._tf_br = rospy.Publisher('/tf', TFMessage, queue_size=100)
-		self._wheel_vel = (0, 0)
 
 	def _move_head(self, cmd):
 		action = self._cozmo.set_head_angle(radians(cmd.data), duration=0.1,
@@ -63,10 +62,11 @@ class CozmoRos(object):
 		self._cozmo.set_all_backpack_lights(light)
 
 	def _twist_callback(self, cmd):
-		# TODO: convert m/s to motor speed actually
-		lv = (cmd.linear.x + cmd.angular.z) * 100.0
-		rv = (cmd.linear.x - cmd.angular.z) * 100.0
-		self._wheel_vel = (lv, rv)
+		# TODO: convert m/s to motor speed using Cozmo API
+		lv = (cmd.linear.x - cmd.angular.z) * 100.0
+		rv = (cmd.linear.x + cmd.angular.z) * 100.0
+
+		self._cozmo.drive_wheels( lv, rv)
 
 	def _say_callback(self, msg):
 		self._cozmo.say_text(msg.data).wait_for_completed()
@@ -160,7 +160,7 @@ class CozmoRos(object):
 			self._publish_battery()
 			# send message repeatedly to avoid idle mode.
 			# This might cause low battery soon
-			self._cozmo.drive_wheels(*self._wheel_vel)
+			#self._cozmo.drive_wheels(*self._wheel_vel)
 			r.sleep()
 		self._cozmo.stop_all_motors()
 
